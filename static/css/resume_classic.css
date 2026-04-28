@@ -1,0 +1,113 @@
+/* Classic Resume Template CSS */
+body, .resume-classic-container {
+    font-family: 'Calibri', Arial, sans-serif;
+    color: #222;
+    background: #fff;
+}
+.resume-classic-container {
+    max-width: 800px;
+    margin: 40px auto;
+    padding: 40px 50px;
+    border: none;
+}
+.resume-header {
+    text-align: center;
+    margin-bottom: 32px;
+    padding-bottom: 8px;
+}
+.resume-header-name {
+    font-size: 32px;
+    font-weight: bold;
+    color: #b5a16c;
+    letter-spacing: 1px;
+}
+.resume-header-surname {
+    font-size: 32px;
+    font-weight: bold;
+    color: #222;
+    letter-spacing: 1px;
+}
+.resume-header-contact {
+    font-size: 15px;
+    color: #222;
+    margin-top: 8px;
+}
+.resume-section {
+    margin-bottom: 24px;
+    text-align: left;
+}
+.resume-section-title {
+    font-size: 22px;
+    font-weight: bold;
+    color: #888;
+    margin-bottom: 12px;
+    padding-bottom: 2px;
+    border-bottom: 2px solid #222;
+    display: block;
+}
+.resume-section-summary {
+    font-size: 16px;
+    color: #222;
+    margin-top: 8px;
+    display: block;
+    line-height: 1.3;
+}
+.resume-item {
+    margin-bottom: 18px;
+}
+.resume-item-title, .resume-item-position, .resume-item-degree {
+    font-weight: bold;
+    font-size: 16px;
+    color: #222;
+}
+.resume-item-company, .resume-item-institution, .resume-item-location, .resume-item-dates {
+    color: #222;
+    font-size: 15px;
+    font-weight: normal;
+}
+.resume-item-description {
+    font-size: 15px;
+    color: #222;
+    margin-top: 2px;
+}
+.resume-languages-table {
+    width: 100%;
+    font-size: 15px;
+    border-collapse: collapse;
+    margin-top: 8px;
+}
+.resume-language-name {
+    width: 30%;
+    padding: 2px 0;
+}
+.resume-language-separator {
+    width: 5%;
+    text-align: center;
+}
+.resume-language-level {
+    width: 65%;
+}
+@media print {
+    body, html {
+        margin: 0 !important;
+        padding: 0 !important;
+    }
+    .resume-classic-container {
+        padding: 32px 32px !important;
+        margin: 0 auto !important;
+    }
+    .resume-section {
+        margin-bottom: 28px !important;
+    }
+    .resume-section-divider {
+        margin-bottom: 10px !important;
+    }
+    .resume-item {
+        margin-bottom: 12px !important;
+    }
+    table, tr, td {
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+    }
+} 
