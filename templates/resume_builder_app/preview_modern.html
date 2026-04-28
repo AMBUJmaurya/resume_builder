@@ -1,0 +1,226 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Preview - {{ resume.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            {% if not is_pdf %}
+            <h1 class="h3 mb-4"><i class="fas fa-eye me-2"></i>Resume Preview (Modern)</h1>
+            {% endif %}
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <div class="btn-group">
+                    <a href="{% url 'resume_builder_edit' resume.id %}" class="btn btn-outline-primary">
+                        <i class="fas fa-edit me-2"></i>Edit
+                    </a>
+                    <button class="btn btn-outline-secondary" onclick="window.print()">
+                        <i class="fas fa-print me-2"></i>Print
+                    </button>
+                    <a href="{% url 'download_resume_pdf' resume.id %}" class="btn btn-success">
+                        <i class="fas fa-download me-2"></i>Download PDF
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Resume Content -->
+    <div style="max-width: 800px; margin: 0 auto; background: white; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; line-height: 1.5; color: #333; box-shadow: 0 4px 6px rgba(0,0,0,0.1);">
+        
+        <!-- Header with Dark Background -->
+        <div style="background: linear-gradient(135deg, #2c3e50 0%, #34495e 100%); color: white; padding: 30px 24px; margin-bottom: 0;">
+            <div style="font-size: 32px; font-weight: 300; line-height: 1.1; margin-bottom: 8px; letter-spacing: 1px;">
+                {{ user.first_name }} {{ user.last_name }}
+            </div>
+            <div style="font-size: 16px; color: #ecf0f1; margin-bottom: 15px; font-weight: 300;">
+                {% if resume.summary %}
+                    {{ resume.summary|truncatewords:20 }}
+                {% endif %}
+            </div>
+            <div style="font-size: 14px; color: #bdc3c7; line-height: 1.8;">
+                {% if user.email %}<span style="display: inline-block; margin-right: 20px;">📧 {{ user.email }}</span>{% endif %}
+                {% if user_profile.phone %}<span style="display: inline-block; margin-right: 20px;">📞 {{ user_profile.phone }}</span>{% endif %}
+                {% if user_profile.linkedin_url %}<span style="display: inline-block; margin-right: 20px;">🔗 LinkedIn</span>{% endif %}
+                {% if user_profile.github_url %}<span style="display: inline-block; margin-right: 20px;">💻 GitHub</span>{% endif %}
+            </div>
+        </div>
+        
+        <!-- Content Section -->
+        <div style="padding: 30px 24px; background: white;">
+            
+            <!-- Professional Summary -->
+            {% if resume.summary %}
+            <div style="margin-bottom: 25px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 12px 0; border-bottom: 2px solid #3498db; padding-bottom: 8px;">
+                    Professional Summary
+                </h2>
+                <p style="margin: 0; color: #555; font-size: 14px; line-height: 1.6;">
+                    {{ resume.summary }}
+                </p>
+            </div>
+            {% endif %}
+            
+            <!-- Experience Section -->
+            {% if resume.experiences.all %}
+            <div style="margin-bottom: 25px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 15px 0; border-bottom: 2px solid #3498db; padding-bottom: 8px;">
+                    Work Experience
+                </h2>
+                {% for experience in resume.experiences.all %}
+                <div style="margin-bottom: 20px; padding-left: 15px; border-left: 4px solid #3498db; background: #f8f9fa; padding: 15px; border-radius: 0 5px 5px 0;">
+                    <div style="margin-bottom: 8px;">
+                        <div style="float: left; width: 70%;">
+                            <h3 style="font-size: 16px; font-weight: 600; color: #2c3e50; margin: 0 0 4px 0;">
+                                {{ experience.position }}
+                            </h3>
+                            <p style="font-size: 14px; color: #3498db; font-weight: 500; margin: 0;">
+                                {{ experience.company }}
+                            </p>
+                        </div>
+                        <div style="float: right; width: 30%; text-align: right; font-size: 12px; color: #7f8c8d; font-weight: 500;">
+                            {{ experience.start_date|date:"M Y" }} - 
+                            {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                    {% if experience.description %}
+                    <p style="margin: 0; color: #555; font-size: 13px; line-height: 1.5;">
+                        {{ experience.description }}
+                    </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Education Section -->
+            {% if resume.educations.all %}
+            <div style="margin-bottom: 25px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 15px 0; border-bottom: 2px solid #27ae60; padding-bottom: 8px;">
+                    Education
+                </h2>
+                {% for education in resume.educations.all %}
+                <div style="margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #27ae60; background: #f8f9fa; padding: 15px; border-radius: 0 5px 5px 0;">
+                    <div style="margin-bottom: 8px;">
+                        <div style="float: left; width: 70%;">
+                            <h3 style="font-size: 16px; font-weight: 600; color: #2c3e50; margin: 0 0 4px 0;">
+                                {{ education.degree }}
+                            </h3>
+                            <p style="font-size: 14px; color: #27ae60; font-weight: 500; margin: 0 0 4px 0;">
+                                {{ education.institution }}
+                            </p>
+                            {% if education.field_of_study %}
+                            <p style="font-size: 12px; color: #7f8c8d; margin: 0;">
+                                {{ education.field_of_study }}
+                            </p>
+                            {% endif %}
+                        </div>
+                        <div style="float: right; width: 30%; text-align: right; font-size: 12px; color: #7f8c8d; font-weight: 500;">
+                            {{ education.start_date|date:"M Y" }} - 
+                            {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Skills Section -->
+            {% if resume.skills.all %}
+            <div style="margin-bottom: 25px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 15px 0; border-bottom: 2px solid #e74c3c; padding-bottom: 8px;">
+                    Skills & Competencies
+                </h2>
+                <div style="overflow: hidden;">
+                    {% for skill in resume.skills.all %}
+                    <div style="float: left; width: 48%; margin-right: 2%; margin-bottom: 10px; background: #fff; padding: 10px 15px; border-radius: 5px; border-left: 4px solid #e74c3c; box-shadow: 0 2px 4px rgba(0,0,0,0.1);">
+                        <div style="font-weight: 600; color: #2c3e50; font-size: 13px;">
+                            {{ skill.name }}
+                        </div>
+                        <div style="font-size: 11px; color: #7f8c8d; text-transform: capitalize;">
+                            {{ skill.get_level_display }}
+                        </div>
+                    </div>
+                    {% if forloop.counter|divisibleby:2 %}
+                    <div style="clear: both;"></div>
+                    {% endif %}
+                    {% endfor %}
+                    <div style="clear: both;"></div>
+                </div>
+            </div>
+            {% endif %}
+            
+            <!-- Projects Section -->
+            {% if resume.projects.all %}
+            <div style="margin-bottom: 25px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 15px 0; border-bottom: 2px solid #f39c12; padding-bottom: 8px;">
+                    Projects
+                </h2>
+                {% for project in resume.projects.all %}
+                <div style="margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #f39c12; background: #f8f9fa; padding: 15px; border-radius: 0 5px 5px 0;">
+                    <h3 style="font-size: 16px; font-weight: 600; color: #2c3e50; margin: 0 0 6px 0;">
+                        {{ project.title }}
+                    </h3>
+                    {% if project.description %}
+                    <p style="margin: 0 0 6px 0; color: #555; font-size: 13px; line-height: 1.5;">
+                        {{ project.description }}
+                    </p>
+                    {% endif %}
+                    {% if project.technologies %}
+                    <p style="margin: 0; font-size: 12px; color: #f39c12; font-weight: 500;">
+                        <strong>Technologies:</strong> {{ project.technologies|join:", " }}
+                    </p>
+                    {% endif %}
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+            <!-- Certifications Section -->
+            {% if resume.certifications.all %}
+            <div style="margin-bottom: 25px;">
+                <h2 style="font-size: 18px; font-weight: 600; color: #2c3e50; text-transform: uppercase; letter-spacing: 1.5px; margin: 0 0 15px 0; border-bottom: 2px solid #9b59b6; padding-bottom: 8px;">
+                    Certifications
+                </h2>
+                {% for certification in resume.certifications.all %}
+                <div style="margin-bottom: 15px; padding-left: 15px; border-left: 4px solid #9b59b6; background: #f8f9fa; padding: 15px; border-radius: 0 5px 5px 0;">
+                    <div style="margin-bottom: 8px;">
+                        <div style="float: left; width: 70%;">
+                            <h3 style="font-size: 16px; font-weight: 600; color: #2c3e50; margin: 0 0 4px 0;">
+                                {{ certification.name }}
+                            </h3>
+                            <p style="font-size: 14px; color: #9b59b6; font-weight: 500; margin: 0;">
+                                {{ certification.issuing_organization }}
+                            </p>
+                        </div>
+                        <div style="float: right; width: 30%; text-align: right; font-size: 12px; color: #7f8c8d; font-weight: 500;">
+                            {{ certification.issue_date|date:"M Y" }}
+                        </div>
+                        <div style="clear: both;"></div>
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+            {% endif %}
+            
+        </div>
+    </div>
+</div>
+
+<style>
+@media print {
+    .btn-group, .navbar, footer {
+        display: none !important;
+    }
+    .container {
+        max-width: none !important;
+        padding: 0 !important;
+    }
+    body {
+        background: white !important;
+    }
+}
+</style>
+{% endblock %} 

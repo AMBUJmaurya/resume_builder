@@ -1,0 +1,612 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Builder{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <!-- Sidebar -->
+        <div class="col-md-3">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header">
+                    <h6 class="mb-0">
+                        <i class="fas fa-list me-2"></i>Resume Sections
+                    </h6>
+                </div>
+                <div class="card-body p-0">
+                    <div class="list-group list-group-flush">
+                        <a href="#basic-info" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-user me-2"></i>Basic Info</span>
+                            <span class="badge bg-primary rounded-pill">1</span>
+                        </a>
+                        <a href="#summary" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-file-text me-2"></i>Summary</span>
+                            <span class="badge bg-primary rounded-pill">2</span>
+                        </a>
+                        <a href="#experience" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-briefcase me-2"></i>Experience</span>
+                            <span class="badge bg-primary rounded-pill">3</span>
+                        </a>
+                        <a href="#education" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-graduation-cap me-2"></i>Education</span>
+                            <span class="badge bg-primary rounded-pill">4</span>
+                        </a>
+                        <a href="#skills" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-tools me-2"></i>Skills</span>
+                            <span class="badge bg-primary rounded-pill">5</span>
+                        </a>
+                        <a href="#projects" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-project-diagram me-2"></i>Projects</span>
+                            <span class="badge bg-primary rounded-pill">6</span>
+                        </a>
+                        <a href="#certifications" class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+                            <span><i class="fas fa-certificate me-2"></i>Certifications</span>
+                            <span class="badge bg-primary rounded-pill">7</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Content -->
+        <div class="col-md-6">
+            <form id="resumeForm" method="post" action="{% if resume %}{% url 'resume_builder_edit' resume.id %}{% else %}{% url 'resume_builder' %}{% endif %}">
+                {% csrf_token %}
+                
+                <!-- Basic Info Section -->
+                <div class="card mb-4" id="basic-info">
+                    <div class="card-header">
+                        <h5 class="mb-0">
+                            <i class="fas fa-user me-2"></i>Basic Information
+                        </h5>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="firstName" class="form-label">First Name *</label>
+                                <input type="text" class="form-control" id="firstName" name="first_name" 
+                                       value="{{ user.first_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="lastName" class="form-label">Last Name *</label>
+                                <input type="text" class="form-control" id="lastName" name="last_name" 
+                                       value="{{ user.last_name }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="email" class="form-label">Email *</label>
+                                <input type="email" class="form-control" id="email" name="email" 
+                                       value="{{ user.email }}" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="phone" class="form-label">Phone</label>
+                                <input type="tel" class="form-control" id="phone" name="phone" 
+                                       value="{% if user_profile.phone %}{{ user_profile.phone }}{% endif %}">
+                            </div>
+                            <div class="col-12 mb-3">
+                                <label for="address" class="form-label">Address</label>
+                                <textarea class="form-control" id="address" name="address" rows="2">{% if user_profile.address %}{{ user_profile.address }}{% endif %}</textarea>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="linkedin" class="form-label">LinkedIn URL</label>
+                                <input type="url" class="form-control" id="linkedin" name="linkedin_url" 
+                                       value="{% if user_profile.linkedin_url %}{{ user_profile.linkedin_url }}{% endif %}">
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="github" class="form-label">GitHub URL</label>
+                                <input type="url" class="form-control" id="github" name="github_url" 
+                                       value="{% if user_profile.github_url %}{{ user_profile.github_url }}{% endif %}">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Summary Section -->
+                <div class="card mb-4" id="summary">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-file-text me-2"></i>Professional Summary
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-outline-primary" onclick="enhanceWithAI('summary')">
+                            <i class="fas fa-magic me-1"></i>Enhance with AI
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label for="summaryText" class="form-label">Summary</label>
+                            <textarea class="form-control" id="summaryText" name="summary" rows="4" 
+                                      placeholder="Write a compelling professional summary...">{% if resume.summary %}{{ resume.summary }}{% endif %}</textarea>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Experience Section -->
+                <div class="card mb-4" id="experience">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-briefcase me-2"></i>Work Experience
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addExperience()">
+                            <i class="fas fa-plus me-1"></i>Add Experience
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="experienceContainer">
+                            <!-- Experience entries will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Education Section -->
+                <div class="card mb-4" id="education">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-graduation-cap me-2"></i>Education
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addEducation()">
+                            <i class="fas fa-plus me-1"></i>Add Education
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="educationContainer">
+                            {% for edu in educations %}
+                            <div class="education-entry border rounded p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-0">Education Entry</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEducation(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Institution</label>
+                                        <input type="text" class="form-control" name="institution[]" value="{{ edu.institution }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Degree</label>
+                                        <input type="text" class="form-control" name="degree[]" value="{{ edu.degree }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Field of Study</label>
+                                        <input type="text" class="form-control" name="field_of_study[]" value="{{ edu.field_of_study }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">GPA</label>
+                                        <input type="number" class="form-control" name="gpa[]" step="0.01" min="0" max="4" value="{{ edu.gpa }}">
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Start Date</label>
+                                        <input type="date" class="form-control" name="education_start_date[]" value="{{ edu.start_date|date:'Y-m-d' }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">End Date</label>
+                                        <input type="date" class="form-control" name="education_end_date[]" value="{% if edu.end_date %}{{ edu.end_date|date:'Y-m-d' }}{% endif %}">
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills Section -->
+                <div class="card mb-4" id="skills">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-tools me-2"></i>Skills
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addSkill()">
+                            <i class="fas fa-plus me-1"></i>Add Skill
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="skillsContainer">
+                            {% for skill in skills %}
+                            <div class="skill-entry border rounded p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-0">Skill Entry</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSkill(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Skill Name</label>
+                                        <input type="text" class="form-control" name="skill_name[]" value="{{ skill.name }}" required>
+                                    </div>
+
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Projects Section -->
+                <div class="card mb-4" id="projects">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-project-diagram me-2"></i>Projects
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addProject()">
+                            <i class="fas fa-plus me-1"></i>Add Project
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="projectsContainer">
+                            {% for project in projects %}
+                            <div class="project-entry border rounded p-3 mb-3">
+                                <div class="d-flex justify-content-between align-items-start mb-2">
+                                    <h6 class="mb-0">Project Entry</h6>
+                                    <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeProject(this)">
+                                        <i class="fas fa-trash"></i>
+                                    </button>
+                                </div>
+                                <div class="row">
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Title</label>
+                                        <input type="text" class="form-control" name="project_title[]" value="{{ project.title }}" required>
+                                    </div>
+                                    <div class="col-md-6 mb-2">
+                                        <label class="form-label">Technologies (comma-separated)</label>
+                                        <input type="text" class="form-control" name="project_technologies[]" value="{{ project.technologies|join:", " }}">
+                                    </div>
+                                    <div class="col-12 mb-2">
+                                        <label class="form-label">Description</label>
+                                        <textarea class="form-control" name="project_description[]" rows="3" required>{{ project.description }}</textarea>
+                                    </div>
+                                </div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Certifications Section -->
+                <div class="card mb-4" id="certifications">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">
+                            <i class="fas fa-certificate me-2"></i>Certifications
+                        </h5>
+                        <button type="button" class="btn btn-sm btn-primary" onclick="addCertification()">
+                            <i class="fas fa-plus me-1"></i>Add Certification
+                        </button>
+                    </div>
+                    <div class="card-body">
+                        <div id="certificationsContainer">
+                            <!-- Certification entries will be added here -->
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Save Button -->
+                <div class="text-center mb-4">
+                    <button type="submit" class="btn btn-success btn-lg">
+                        <i class="fas fa-save me-2"></i>Save Resume
+                    </button>
+                </div>
+            </form>
+        </div>
+
+        <!-- Preview Panel -->
+        <div class="col-md-3">
+            <div class="card sticky-top" style="top: 20px;">
+                <div class="card-header d-flex justify-content-between align-items-center">
+                    <h6 class="mb-0">
+                        <i class="fas fa-eye me-2"></i>Live Preview
+                    </h6>
+                    <div class="dropdown">
+                        <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" data-bs-toggle="dropdown">
+                            Template
+                        </button>
+                        <ul class="dropdown-menu">
+                            <li><a class="dropdown-item" href="#" onclick="changeTemplate('modern')">Modern</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="changeTemplate('classic')">Classic</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="changeTemplate('creative')">Creative</a></li>
+                            <li><a class="dropdown-item" href="#" onclick="changeTemplate('minimal')">Minimal</a></li>
+                        </ul>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div id="resumePreview" class="border rounded p-3" style="min-height: 400px;">
+                        <div class="text-center text-muted">
+                            <i class="fas fa-file-alt fa-2x mb-2"></i>
+                            <p>Your resume preview will appear here</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Templates for dynamic content -->
+<template id="experienceTemplate">
+    <div class="experience-entry border rounded p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="mb-0">Experience Entry</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeExperience(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Company</label>
+                <input type="text" class="form-control" name="company[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Position</label>
+                <input type="text" class="form-control" name="position[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" name="start_date[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" name="end_date[]">
+            </div>
+            <div class="col-12 mb-2">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="description[]" rows="3" required></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="educationTemplate">
+    <div class="education-entry border rounded p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="mb-0">Education Entry</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeEducation(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Institution</label>
+                <input type="text" class="form-control" name="institution[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Degree</label>
+                <input type="text" class="form-control" name="degree[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Field of Study</label>
+                <input type="text" class="form-control" name="field_of_study[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">GPA</label>
+                <input type="number" class="form-control" name="gpa[]" step="0.01" min="0" max="4">
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Start Date</label>
+                <input type="date" class="form-control" name="education_start_date[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">End Date</label>
+                <input type="date" class="form-control" name="education_end_date[]">
+            </div>
+        </div>
+    </div>
+</template>
+
+<template id="skillTemplate">
+    <div class="skill-entry border rounded p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="mb-0">Skill Entry</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeSkill(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Skill Name</label>
+                <input type="text" class="form-control" name="skill_name[]" required>
+            </div>
+
+        </div>
+    </div>
+</template>
+
+<template id="projectTemplate">
+    <div class="project-entry border rounded p-3 mb-3">
+        <div class="d-flex justify-content-between align-items-start mb-2">
+            <h6 class="mb-0">Project Entry</h6>
+            <button type="button" class="btn btn-sm btn-outline-danger" onclick="removeProject(this)">
+                <i class="fas fa-trash"></i>
+            </button>
+        </div>
+        <div class="row">
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Title</label>
+                <input type="text" class="form-control" name="project_title[]" required>
+            </div>
+            <div class="col-md-6 mb-2">
+                <label class="form-label">Technologies (comma-separated)</label>
+                <input type="text" class="form-control" name="project_technologies[]">
+            </div>
+            <div class="col-12 mb-2">
+                <label class="form-label">Description</label>
+                <textarea class="form-control" name="project_description[]" rows="3" required></textarea>
+            </div>
+        </div>
+    </div>
+</template>
+{% endblock %}
+
+{% block extra_js %}
+<script>
+let currentTemplate = 'modern';
+
+// Initialize form
+document.addEventListener('DOMContentLoaded', function() {
+    // Add initial entries
+    addExperience();
+    addEducation();
+    addSkill();
+    
+    // Set up form submission
+    document.getElementById('resumeForm').addEventListener('submit', saveResume);
+    
+    // Set up real-time preview
+    setupPreviewUpdates();
+});
+
+// Helper function to get CSRF token
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+
+function addExperience() {
+    const container = document.getElementById('experienceContainer');
+    const template = document.getElementById('experienceTemplate');
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+}
+
+function removeExperience(button) {
+    button.closest('.experience-entry').remove();
+}
+
+function addEducation() {
+    const container = document.getElementById('educationContainer');
+    const template = document.getElementById('educationTemplate');
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+}
+
+function removeEducation(button) {
+    button.closest('.education-entry').remove();
+}
+
+function addSkill() {
+    const container = document.getElementById('skillsContainer');
+    const template = document.getElementById('skillTemplate');
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+}
+
+function removeSkill(button) {
+    button.closest('.skill-entry').remove();
+}
+
+function addProject() {
+    const container = document.getElementById('projectsContainer');
+    const template = document.getElementById('projectTemplate');
+    const clone = template.content.cloneNode(true);
+    container.appendChild(clone);
+}
+
+function removeProject(button) {
+    button.closest('.project-entry').remove();
+}
+
+function addCertification() {
+    // Implementation for adding certifications
+    alert('Certification functionality will be implemented');
+}
+
+function enhanceWithAI(section) {
+    const content = document.getElementById(section + 'Text').value;
+    if (!content) {
+        alert('Please enter some content to enhance');
+        return;
+    }
+    
+    fetch('/api/ai-enhance/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify({
+            content: content,
+            section: section
+        })
+    })
+    .then(response => response.json())
+    .then(data => {
+        if (data.enhanced_content) {
+            document.getElementById(section + 'Text').value = data.enhanced_content;
+            updatePreview();
+        } else {
+            alert('Error enhancing content');
+        }
+    })
+    .catch(error => {
+        alert('Error: ' + error.message);
+    });
+}
+
+function saveResume(e) {
+    // Show loading state
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Saving...';
+    submitBtn.disabled = true;
+    
+    // Add template to form data
+    const templateInput = document.createElement('input');
+    templateInput.type = 'hidden';
+    templateInput.name = 'template';
+    templateInput.value = currentTemplate;
+    e.target.appendChild(templateInput);
+    
+    // Let the form submit naturally to the Django view
+    // The view will handle the redirect to preview
+    return true; // Allow form submission to continue
+}
+
+function changeTemplate(template) {
+    currentTemplate = template;
+    updatePreview();
+}
+
+function setupPreviewUpdates() {
+    const inputs = document.querySelectorAll('input, textarea, select');
+    inputs.forEach(input => {
+        input.addEventListener('input', updatePreview);
+        input.addEventListener('change', updatePreview);
+    });
+}
+
+function updatePreview() {
+    const preview = document.getElementById('resumePreview');
+    const firstName = document.getElementById('firstName').value || 'Your';
+    const lastName = document.getElementById('lastName').value || 'Name';
+    const email = document.getElementById('email').value || 'email@example.com';
+    const phone = document.getElementById('phone').value || '';
+    const summary = document.getElementById('summaryText').value || 'Professional summary will appear here...';
+    
+    preview.innerHTML = `
+        <div class="preview-content">
+            <h4 class="text-primary mb-2">${firstName} ${lastName}</h4>
+            <p class="text-muted small mb-2">${email} ${phone ? '• ' + phone : ''}</p>
+            <hr>
+            <h6 class="text-primary">Professional Summary</h6>
+            <p class="small">${summary}</p>
+            <hr>
+            <h6 class="text-primary">Experience</h6>
+            <p class="small text-muted">Work experience will appear here...</p>
+            <hr>
+            <h6 class="text-primary">Education</h6>
+            <p class="small text-muted">Education details will appear here...</p>
+            <hr>
+            <h6 class="text-primary">Skills</h6>
+            <p class="small text-muted">Skills will appear here...</p>
+        </div>
+    `;
+}
+</script>
+{% endblock %} 

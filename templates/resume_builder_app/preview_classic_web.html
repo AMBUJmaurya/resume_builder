@@ -1,0 +1,95 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}Resume Preview - {{ resume.title }}{% endblock %}
+
+{% block content %}
+<link rel="stylesheet" href="{% static 'css/resume_classic.css' %}?v=2">
+<!-- Action Buttons (hidden on print) -->
+<div class="btn-group" style="margin: 20px 0 20px 0; display: flex; gap: 8px; justify-content: flex-end;">
+    <a href="{% url 'resume_builder_edit' resume.id %}" class="btn btn-outline-primary">Edit</a>
+    <button class="btn btn-outline-secondary" onclick="window.print()">Print</button>
+    <a href="{% url 'download_resume_pdf' resume.id %}" class="btn btn-success">Download PDF</a>
+</div>
+<div class="resume-classic-container">
+    <!-- Header -->
+    <div class="resume-header">
+        <span class="resume-header-name">{{ user.first_name|upper }}</span>
+        <span class="resume-header-surname">{{ user.last_name|upper }}</span>
+        <div class="resume-header-contact">
+            {% if user_profile.address %}{{ user_profile.address }}{% endif %}
+            {% if user_profile.city %}, {{ user_profile.city }}{% endif %}
+            {% if user_profile.state %}, {{ user_profile.state }}{% endif %}
+            {% if user_profile.zip_code %}, {{ user_profile.zip_code }}{% endif %}
+            {% if user_profile.country %}, {{ user_profile.country }}{% endif %}
+            {% if user_profile.address or user_profile.city or user_profile.state or user_profile.zip_code or user_profile.country %} – {% endif %}
+            {% if user_profile.phone %}{{ user_profile.phone }}{% endif %}
+            {% if user.email %} – {{ user.email }}{% endif %}
+        </div>
+    </div>
+    <!-- Profile -->
+    <div class="resume-section">
+        <div class="resume-section-title">Profile</div>
+        <div class="resume-section-divider"></div>
+        <div class="resume-section-summary">{{ resume.summary }}</div>
+    </div>
+    <!-- Experience -->
+    <div class="resume-section">
+        <div class="resume-section-title">Experience</div>
+        <div class="resume-section-divider"></div>
+        {% for experience in resume.experiences.all %}
+        <div class="resume-item">
+            <span class="resume-item-position">{{ experience.position }}</span>,
+            <span class="resume-item-company">{{ experience.company }}</span>,
+            <span class="resume-item-location">{{ experience.city }}, {{ experience.state }}</span><br>
+            <span class="resume-item-dates">{{ experience.start_date|date:'Y' }} – {% if experience.current %}present{% else %}{{ experience.end_date|date:'Y' }}{% endif %}</span>
+            <div class="resume-item-description">{{ experience.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Education -->
+    <div class="resume-section">
+        <div class="resume-section-title">Education</div>
+        <div class="resume-section-divider"></div>
+        {% for education in resume.educations.all %}
+        <div class="resume-item">
+            <span class="resume-item-degree">{{ education.degree }}</span>,
+            <span class="resume-item-institution">{{ education.institution }}</span>,
+            <span class="resume-item-location">{{ education.city }}, {{ education.state }}</span><br>
+            <span class="resume-item-dates">{{ education.start_date|date:'Y' }} – {% if education.current %}present{% else %}{{ education.end_date|date:'Y' }}{% endif %}</span>
+            <div class="resume-item-description">{{ education.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    <!-- Projects -->
+    {% if resume.projects.all %}
+    <div class="resume-section">
+        <div class="resume-section-title">Projects</div>
+        <div class="resume-section-divider"></div>
+        {% for project in resume.projects.all %}
+        <div class="resume-item">
+            <span class="resume-item-title">{{ project.title }}</span>
+            {% if project.technologies %}<span class="resume-item-technologies"> ({{ project.technologies|join:", " }})</span>{% endif %}<br>
+            <div class="resume-item-description">{{ project.description }}</div>
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+    <!-- Languages -->
+    <div class="resume-section">
+        <div class="resume-section-title">Languages</div>
+        <div class="resume-section-divider"></div>
+        <table class="resume-languages-table">
+            <tbody>
+            {% for language in resume.languages.all %}
+                <tr>
+                    <td class="resume-language-name">{{ language.name }}</td>
+                    <td class="resume-language-separator">:</td>
+                    <td class="resume-language-level">{{ language.get_proficiency_display }}</td>
+                </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %} 

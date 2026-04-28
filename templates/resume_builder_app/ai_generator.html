@@ -1,0 +1,157 @@
+{% extends 'base.html' %}
+
+{% block title %}AI Resume Generator - AI Resume Builder{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row justify-content-center">
+        <div class="col-lg-8">
+            <div class="card">
+                <div class="card-header text-center">
+                    <h2 class="mb-0">
+                        <i class="fas fa-magic me-2"></i>AI Resume Generator
+                    </h2>
+                    <p class="text-muted mb-0">Let AI create your professional resume</p>
+                </div>
+                <div class="card-body">
+                    <form id="aiGeneratorForm">
+                        {% csrf_token %}
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="jobTitle" class="form-label">Job Title *</label>
+                                <input type="text" class="form-control" id="jobTitle" name="job_title" 
+                                    placeholder="e.g., Software Engineer" required>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="yearsExperience" class="form-label">Years of Experience *</label>
+                                <select class="form-select" id="yearsExperience" name="years_of_experience" required>
+                                    <option value="">Select experience level</option>
+                                    <option value="0-1">0-1 years (Entry Level)</option>
+                                    <option value="2-3">2-3 years (Junior)</option>
+                                    <option value="4-6">4-6 years (Mid-level)</option>
+                                    <option value="7-10">7-10 years (Senior)</option>
+                                    <option value="10+">10+ years (Expert)</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label for="industry" class="form-label">Industry</label>
+                                <select class="form-select" id="industry" name="industry">
+                                    <option value="">Select industry</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="education">Education</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="sales">Sales</option>
+                                    <option value="consulting">Consulting</option>
+                                    <option value="other">Other</option>
+                                </select>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label for="educationLevel" class="form-label">Education Level</label>
+                                <select class="form-select" id="educationLevel" name="education_level">
+                                    <option value="">Select education</option>
+                                    <option value="high_school">High School</option>
+                                    <option value="associate">Associate's Degree</option>
+                                    <option value="bachelor">Bachelor's Degree</option>
+                                    <option value="master">Master's Degree</option>
+                                    <option value="phd">PhD</option>
+                                </select>
+                            </div>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="skills" class="form-label">Key Skills (comma separated)</label>
+                            <textarea class="form-control" id="skills" name="skills" rows="3" 
+                                    placeholder="e.g., Python, JavaScript, React, AWS, Docker"></textarea>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="additionalInfo" class="form-label">Additional Information</label>
+                            <textarea class="form-control" id="additionalInfo" name="additional_info" rows="4" 
+                                    placeholder="Any additional information about your background, achievements, or specific requirements..."></textarea>
+                        </div>
+                        
+                        <div class="text-center">
+                            <button type="submit" class="btn btn-primary btn-lg">
+                                <i class="fas fa-magic me-2"></i>Generate Resume with AI
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.getElementById('aiGeneratorForm').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const submitBtn = e.target.querySelector('button[type="submit"]');
+    const originalText = submitBtn.innerHTML;
+    submitBtn.innerHTML = '<i class="fas fa-spinner fa-spin me-2"></i>Generating...';
+    submitBtn.disabled = true;
+    
+    const formData = new FormData(e.target);
+    const data = {
+        job_title: formData.get('job_title'),
+        years_of_experience: formData.get('years_of_experience'),
+        industry: formData.get('industry'),
+        education_level: formData.get('education_level'),
+        skills: formData.get('skills').split(',').map(s => s.trim()).filter(s => s),
+        additional_info: formData.get('additional_info')
+    };
+    
+    fetch('/api/ai-generate/', {
+        method: 'POST',
+        headers: {
+            'Content-Type': 'application/json',
+            'X-CSRFToken': getCookie('csrftoken')
+        },
+        body: JSON.stringify(data)
+    })
+    .then(response => {
+        if (!response.ok) {
+            throw new Error('Network response was not ok');
+        }
+        return response.json();
+    })
+    .then(data => {
+        if (data.resume_id) {
+            alert('Resume generated successfully!');
+            window.location.href = `/preview/${data.resume_id}/`;
+        } else {
+            throw new Error('No resume ID returned');
+        }
+    })
+    .catch(error => {
+        console.error('Error:', error);
+        alert('Error generating resume: ' + error.message);
+    })
+    .finally(() => {
+        submitBtn.innerHTML = originalText;
+        submitBtn.disabled = false;
+    });
+});
+
+function getCookie(name) {
+    let cookieValue = null;
+    if (document.cookie && document.cookie !== '') {
+        const cookies = document.cookie.split(';');
+        for (let i = 0; i < cookies.length; i++) {
+            const cookie = cookies[i].trim();
+            if (cookie.substring(0, name.length + 1) === (name + '=')) {
+                cookieValue = decodeURIComponent(cookie.substring(name.length + 1));
+                break;
+            }
+        }
+    }
+    return cookieValue;
+}
+</script>
+{% endblock %} 

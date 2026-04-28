@@ -1,0 +1,201 @@
+{% extends 'base.html' %}
+
+{% block title %}Resume Preview - {{ resume.title }}{% endblock %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="row">
+        <div class="col-12 d-flex justify-content-between align-items-center mb-3 print-hide">
+            <h1 class="h4">
+                <i class="fas fa-eye me-2"></i> Resume Preview (Minimal)
+            </h1>
+            <div class="btn-group">
+                <a href="{% url 'resume_builder_edit' resume.id %}" class="btn btn-outline-primary">
+                    <i class="fas fa-edit me-2"></i> Edit
+                </a>
+                <button class="btn btn-outline-secondary" onclick="window.print()">
+                    <i class="fas fa-print me-2"></i> Print
+                </button>
+                <a href="{% url 'download_resume_pdf' resume.id %}" class="btn btn-success">
+                    <i class="fas fa-download me-2"></i> Download PDF
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="resume-wrapper p-4 mx-auto">
+        <!-- Resume Header -->
+<div class="border-bottom pb-3 mb-4">
+    <table style="width: 100%;">
+        <tr>
+            <!-- Name on left -->
+            <td style="vertical-align: top; width: 60%;">
+                <h1 style="font-size: 24px; margin: 0;">
+                    {% if user.first_name or user.last_name %}
+                        {{ user.first_name }} {{ user.last_name }}
+                    {% elif user_profile.full_name %}
+                        {{ user_profile.full_name }}
+                    {% elif resume.full_name %}
+                        {{ resume.full_name }}
+                    {% else %}
+                        Your Name
+                    {% endif %}
+                </h1>
+            </td>
+
+            <!-- Contact info on right -->
+            <td style="text-align: right; font-size: 12px; vertical-align: top;">
+                {% if user.email %}<div>{{ user.email }}</div>{% endif %}
+                {% if user_profile.phone %}<div>{{ user_profile.phone }}</div>{% endif %}
+                {% if user_profile.address %}<div>{{ user_profile.address }}</div>{% endif %}
+                {% if user_profile.linkedin_url %}
+                    <div>
+                        <a href="{{ user_profile.linkedin_url }}" style="color: #0072b1; text-decoration: none;">{{ user_profile.linkedin_url }}</a>
+                    </div>
+                {% endif %}
+                {% if user_profile.github_url %}
+                    <div>
+                        <a href="{{ user_profile.github_url }}" style="color: #333; text-decoration: none;">{{ user_profile.github_url }}</a>
+                    </div>
+                {% endif %}
+            </td>
+        </tr>
+    </table>
+</div>
+
+        
+
+
+        
+
+        <!-- Summary -->
+        {% if resume.summary %}
+        <div class="mb-3">
+            <h5 class="section-title">Summary</h5>
+            <p>{{ resume.summary }}</p>
+        </div>
+        {% endif %}
+
+        <!-- Experience -->
+        {% if resume.experiences.all %}
+        <div class="mb-3">
+            <h5 class="section-title">Experience</h5>
+            {% for experience in resume.experiences.all %}
+            <div class="mb-2">
+                <strong>{{ experience.position }}</strong>, <span class="text-muted">{{ experience.company }}</span>
+                <div class="text-muted small">
+                    {{ experience.start_date|date:"M Y" }} - {% if experience.current %}Present{% else %}{{ experience.end_date|date:"M Y" }}{% endif %}
+                </div>
+                {% if experience.description %}
+                <p class="mb-1">{{ experience.description }}</p>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Education -->
+        {% if resume.educations.all %}
+        <div class="mb-3">
+            <h5 class="section-title">Education</h5>
+            {% for education in resume.educations.all %}
+            <div class="mb-2">
+                <strong>{{ education.degree }}</strong>, {{ education.institution }}
+
+                <div class="text-muted small">
+                    {{ education.start_date|date:"M Y" }} - {% if education.current %}Present{% else %}{{ education.end_date|date:"M Y" }}{% endif %}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Skills -->
+        {% if resume.skills.all %}
+        <ul class="list-unstyled mb-3">
+            <h5 class="section-title">Skills</h5>
+            {% for skill in resume.skills.all %}
+            <li>- {{ skill.name }}</li>
+            {% endfor %}
+        </ul>
+        {% endif %}
+
+        <!-- Projects -->
+        {% if resume.projects.all %}
+        <div class="mb-3">
+            <h5 class="section-title">Projects</h5>
+            {% for project in resume.projects.all %}
+            <div class="mb-2">
+                <strong>{{ project.title }}</strong>
+                {% if project.description %} — {{ project.description }}{% endif %}
+                {% if project.technologies %}
+                    <div class="text-muted small">Tech: {{ project.technologies|join:", " }}</div>
+                {% endif %}
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+
+        <!-- Certifications -->
+        {% if resume.certifications.all %}
+        <div class="mb-2">
+            <h5 class="section-title">Certifications</h5>
+            {% for cert in resume.certifications.all %}
+            <div class="mb-1">
+                <strong>{{ cert.name }}</strong>, {{ cert.issuing_organization }}
+                <div class="text-muted small">Issued: {{ cert.issue_date|date:"M Y" }}</div>
+            </div>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<style>
+/* Resume Layout */
+.resume-wrapper {
+    max-width: 794px; /* A4 width in pixels at 96dpi */
+    background: white;
+    border: 1px solid #ddd;
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    line-height: 1.5;
+}
+
+/* Headings */
+.section-title {
+    font-size: 14px;
+    font-weight: bold;
+    text-transform: uppercase;
+    border-bottom: 1px solid #ccc;
+    padding-bottom: 2px;
+    margin-bottom: 8px;
+}
+
+/* Print Styles */
+@media print {
+    .print-hide, .navbar, .btn-group, footer {
+        display: none !important;
+    }
+
+    .container-fluid, .resume-wrapper {
+        width: 100% !important;
+        max-width: none !important;
+        margin: 0 !important;
+        padding: 0 !important;
+        border: none !important;
+        box-shadow: none !important;
+    }
+
+    body {
+        background: white !important;
+        margin: 0;
+    }
+
+    @page {
+        size: A4;
+        margin: 20mm 15mm 20mm 15mm;
+    }
+}
+</style>
+{% endblock %}

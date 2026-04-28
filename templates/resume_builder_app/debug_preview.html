@@ -1,0 +1,80 @@
+{% extends 'base.html' %}
+
+{% block title %}Debug Preview - {{ resume.title }}{% endblock %}
+
+{% block content %}
+<div class="container">
+    <div class="row">
+        <div class="col-12">
+            <h1>Debug Preview</h1>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Resume Data</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Resume ID:</strong> {{ resume.id }}</p>
+                    <p><strong>Resume Title:</strong> {{ resume.title }}</p>
+                    <p><strong>Resume Summary:</strong> {{ resume.summary }}</p>
+                    <p><strong>Resume Template:</strong> {{ resume.template }}</p>
+                    <p><strong>User:</strong> {{ user.first_name }} {{ user.last_name }}</p>
+                    <p><strong>User Email:</strong> {{ user.email }}</p>
+                    <p><strong>User Profile:</strong> {{ user_profile }}</p>
+                    {% if user_profile %}
+                        <p><strong>Phone:</strong> {{ user_profile.phone }}</p>
+                        <p><strong>Address:</strong> {{ user_profile.address }}</p>
+                        <p><strong>LinkedIn:</strong> {{ user_profile.linkedin_url }}</p>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="card mb-4">
+                <div class="card-header">
+                    <h5>Related Objects</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Experiences:</strong> {{ resume.experiences.count }}</p>
+                    {% for exp in resume.experiences.all %}
+                        <div class="border p-2 mb-2">
+                            <p><strong>Company:</strong> {{ exp.company }}</p>
+                            <p><strong>Position:</strong> {{ exp.position }}</p>
+                            <p><strong>Description:</strong> {{ exp.description }}</p>
+                        </div>
+                    {% endfor %}
+                    
+                    <p><strong>Education:</strong> {{ resume.educations.count }}</p>
+                    {% for edu in resume.educations.all %}
+                        <div class="border p-2 mb-2">
+                            <p><strong>Institution:</strong> {{ edu.institution }}</p>
+                            <p><strong>Degree:</strong> {{ edu.degree }}</p>
+                            <p><strong>Field:</strong> {{ edu.field_of_study }}</p>
+                        </div>
+                    {% endfor %}
+                    
+                    <p><strong>Skills:</strong> {{ resume.skills.count }}</p>
+                    {% for skill in resume.skills.all %}
+                        <div class="border p-2 mb-2">
+                            <p><strong>Name:</strong> {{ skill.name }}</p>
+    
+                        </div>
+                    {% endfor %}
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header">
+                    <h5>Template Context</h5>
+                </div>
+                <div class="card-body">
+                    <p><strong>Template:</strong> {{ template }}</p>
+                    <p><strong>Available Templates:</strong> modern, classic, creative, minimal</p>
+                    <a href="{% url 'preview_resume' resume.id %}?template=modern" class="btn btn-primary">Modern Template</a>
+                    <a href="{% url 'preview_resume' resume.id %}?template=classic" class="btn btn-primary">Classic Template</a>
+                    <a href="{% url 'preview_resume' resume.id %}?template=creative" class="btn btn-primary">Creative Template</a>
+                    <a href="{% url 'preview_resume' resume.id %}?template=minimal" class="btn btn-primary">Minimal Template</a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %} 
